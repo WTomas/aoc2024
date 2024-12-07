@@ -1,0 +1,2 @@
+# Build all executables
+cabal build all
