@@ -1,10 +1,8 @@
 module Main where
 
 import Data.List (transpose, sort)
-import Utils ( printSolution1, printSolution2, makeCounter, (!) )
+import Utils ( printSolution1, printSolution2, makeCounter, (!), readInt)
 
-readInt :: String -> Int
-readInt = read
 
 getDistance :: [Int] -> Int
 getDistance (a:b:[]) = abs (a - b)

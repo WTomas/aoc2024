@@ -20,7 +20,10 @@ executable day01
   import:           common-settings
   main-is:          Day01.hs
   hs-source-dirs:   challenges
-  build-depends:    
-    text, 
-    count ^>= 0.0.1
+  other-modules:    Utils
+
+executable day02
+  import:           common-settings
+  main-is:          Day02.hs
+  hs-source-dirs:   challenges
   other-modules:    Utils
