@@ -29,5 +29,3 @@ makeCounter as = foldl incrementCounter Counter { _map = M.empty } as
 
 instance (Ord a, Show a) => Show (Counter a) where
     show (Counter { _map }) = show _map
-
-
