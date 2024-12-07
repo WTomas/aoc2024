@@ -27,3 +27,9 @@ executable day02
   main-is:          Day02.hs
   hs-source-dirs:   challenges
   other-modules:    Utils
+
+executable day03
+  import:           common-settings
+  main-is:          Day03.hs
+  hs-source-dirs:   challenges
+  other-modules:    Utils
