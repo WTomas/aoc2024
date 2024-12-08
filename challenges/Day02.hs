@@ -1,7 +1,7 @@
 module Main where
 
 import Data.List (sort)
-import Utils (readInt, printSolution1, deleteIndex, printSolution2)
+import Utils (readInt, printSolution1, deleteIndex, printSolution2, boolToInt)
 
 isIncreasingSequence :: [Int] -> Bool
 isIncreasingSequence levels = all id $ map (uncurry (==)) $ zip levels (sort levels)
@@ -25,10 +25,6 @@ alternativeReports levels = [levels] ++ map ((flip deleteIndex) levels) (takeWhi
 
 isSafeAlternative :: [[Int]] -> Bool
 isSafeAlternative alternativeLevels = any id $ map isSafe alternativeLevels
-
-boolToInt :: Bool -> Int
-boolToInt True = 1
-boolToInt False = 0
 
 solution1 :: String -> Int
 solution1 input = sum . map (boolToInt . isSafe) . (map (map readInt . words)) . lines $ input

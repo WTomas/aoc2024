@@ -36,3 +36,22 @@ instance (Ord a, Show a) => Show (Counter a) where
 
 deleteIndex :: Int -> [a] -> [a]
 deleteIndex idx arr = map snd $ filter ( (/=) idx . fst) $ zip [0..] arr
+
+enumerate :: [a] -> [(Int, a)]
+enumerate = zip [0..]
+
+type Position = (Int, Int)
+
+flatMatrix :: [[a]] -> [(Position, a)]
+flatMatrix values = concat $ map (\(yIndex, withX) -> map (\(xIndex, value) -> ((xIndex, yIndex), value)) withX) $ enumerate $ map enumerate values
+
+splitEvery :: Int -> [a] -> [[a]]
+splitEvery _ [] = []
+splitEvery n list = first : (splitEvery n rest)
+  where
+    (first,rest) = splitAt n list
+
+
+boolToInt :: Bool -> Int
+boolToInt True = 1
+boolToInt False = 0

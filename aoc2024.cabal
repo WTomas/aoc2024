@@ -33,3 +33,9 @@ executable day03
   main-is:          Day03.hs
   hs-source-dirs:   challenges
   other-modules:    Utils
+
+executable day04
+  import:           common-settings
+  main-is:          Day04.hs
+  hs-source-dirs:   challenges
+  other-modules:    Utils
