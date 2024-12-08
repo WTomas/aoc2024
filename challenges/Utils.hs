@@ -55,3 +55,6 @@ splitEvery n list = first : (splitEvery n rest)
 boolToInt :: Bool -> Int
 boolToInt True = 1
 boolToInt False = 0
+
+isSubsetOf :: Eq a => [a] -> [a] -> Bool
+isSubsetOf l1 l2 = any (\(v1) -> any (\(v2) -> v1 == v2) l2) l1
