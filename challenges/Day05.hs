@@ -2,7 +2,7 @@ module Main where
 
 import qualified Data.Map as M
 import qualified Data.Text as T
-import Utils (readInt, enumerate, isSubsetOf, printSolution1)
+import Utils (readInt, enumerate, isSubsetOf, printSolution1, printSolution2, uncurry3)
 import Data.Maybe (fromMaybe)
 
 type Mapping = M.Map Int [Int]
@@ -40,12 +40,40 @@ getMiddleValue :: [Int] -> Int
 getMiddleValue [] = 0
 getMiddleValue values = values !! (length values `div` 2)
 
+reorderPageNumbers :: Mapping -> [Int] -> [Int]
+reorderPageNumbers mapping pageNumbers = get3rd $ reorderPageNumbers' mapping pageNumbers []
+    where 
+        reorderPageNumbers' :: Mapping -> [Int] -> [Int] -> (Mapping, [Int], [Int])
+        reorderPageNumbers' mapping [] reordered = (mapping, [], reordered)
+        reorderPageNumbers' mapping (pageNumber:pageNumbers) reordered = uncurry3 reorderPageNumbers' (mapping, pageNumbers, insertElement mapping pageNumber reordered)
+
+        insertElement :: Mapping -> Int -> [Int] -> [Int]
+        insertElement mapping pageNumber reorderedPageNumbers = do
+            let mustBeBefore = fromMaybe [] $ M.lookup pageNumber mapping
+            let boolValues = scanr1 (||) $ map ((flip elem) mustBeBefore) reorderedPageNumbers
+            let (before, after) = groupElements(zip boolValues reorderedPageNumbers)
+            before ++ [pageNumber] ++ after
+
+        groupElements :: [(Bool, a)] -> ([a], [a])
+        groupElements = foldl (\(trueValues, falseValues) (b, value) -> if b then (trueValues ++ [value], falseValues) else (trueValues, falseValues ++ [value])) ([], [])
+
+        get3rd :: (a, b, c) -> c
+        get3rd (_,_,x) = x
+
 solution1 :: String -> Int
 solution1 input = do
     let (mapping, pageNumbers) = parseInput input
     sum $ map getMiddleValue $ filter (arePageNumbersCorrect mapping) pageNumbers
 
+solution2 :: String -> Int
+solution2 input = do
+    let (mapping, pageNumbers) = parseInput input
+    let incorrectPageNumbers = filter (not . arePageNumbersCorrect mapping) pageNumbers
+    -- sum $ map getMiddleValue $ map (reorderPageNumbers mapping) incorrectPageNumbers
+    sum $ map getMiddleValue $ map (reorderPageNumbers mapping) incorrectPageNumbers
+
 main :: IO()
 main = do
     input <- readFile "inputs/day05.txt"
     printSolution1 $ solution1 input
+    printSolution2 $ solution2 input

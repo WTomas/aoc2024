@@ -58,3 +58,6 @@ boolToInt False = 0
 
 isSubsetOf :: Eq a => [a] -> [a] -> Bool
 isSubsetOf l1 l2 = any (\(v1) -> any (\(v2) -> v1 == v2) l2) l1
+
+uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
+uncurry3 f (x, y, z) = f x y z 
