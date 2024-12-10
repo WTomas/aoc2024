@@ -1,7 +1,7 @@
 module Main where
 
 import Data.List (sort)
-import Utils (readInt, printSolution1, deleteIndex, printSolution2, boolToInt)
+import ChallengeUtils (readInt, printSolution1, deleteIndex, printSolution2, boolToInt)
 
 isIncreasingSequence :: [Int] -> Bool
 isIncreasingSequence levels = all id $ map (uncurry (==)) $ zip levels (sort levels)

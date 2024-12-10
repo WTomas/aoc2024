@@ -2,55 +2,9 @@
 module Main where
 import Control.Applicative (Alternative (many), (<|>), empty)
 import Data.Char (isDigit)
-import Utils ( readInt, printSolution1, printSolution2 )
+import ChallengeUtils ( readInt, printSolution1, printSolution2, Parser (runParser, Parser), parseString, parseChar, parseSpan )
 
 data Token = Mul Int Int | Gibberish | Do | Dont deriving (Show)
-
-newtype Parser a = Parser { runParser :: String -> Maybe (String, a) }
-
-instance Functor Parser where
-     fmap f (Parser g) = Parser h
-        where
-            h s = do
-                (remaining, x) <- g s
-                Just (remaining, f x)
-
-instance Applicative Parser where
-    Parser f <*> Parser a = Parser g
-        where 
-            g s = do
-                (remaining, f') <- f s
-                (remaining', a') <- a remaining
-                Just (remaining', f' a')
-    pure x = Parser h
-        where 
-            h s = Just (s, x)
-
-instance Alternative Parser where
-    (<|>) :: Parser a -> Parser a -> Parser a
-    (Parser a) <|> (Parser b) = Parser f
-        where f s = a s <|> b s
-    empty = Parser (\_ -> Nothing)
-
-parsePredicate :: (Char -> Bool) -> Parser Char
-parsePredicate predicate = Parser f where
-    f (x:xs)
-        | predicate x = Just (xs, x)
-        | otherwise = Nothing
-    f [] = Nothing
-
-parseChar :: Char -> Parser Char
-parseChar c = parsePredicate (\input -> input == c)
-
-parseString :: String -> Parser String
-parseString = sequenceA . map parseChar
-
-parseSpan :: (Char -> Bool) -> Parser String
-parseSpan predicate = Parser f
-    where
-        f s = do
-            let (spanned, remaining) = (span predicate) s  
-            if spanned == [] then Nothing else Just (remaining, spanned)
 
 parseMul :: Parser Token
 parseMul = Parser f 

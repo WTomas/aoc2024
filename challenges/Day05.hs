@@ -2,7 +2,7 @@ module Main where
 
 import qualified Data.Map as M
 import qualified Data.Text as T
-import Utils (readInt, enumerate, isSubsetOf, printSolution1, printSolution2, uncurry3)
+import ChallengeUtils (readInt, enumerate, isSubsetOf, printSolution1, printSolution2, uncurry3, get3rd)
 import Data.Maybe (fromMaybe)
 
 type Mapping = M.Map Int [Int]
@@ -51,14 +51,11 @@ reorderPageNumbers mapping pageNumbers = get3rd $ reorderPageNumbers' mapping pa
         insertElement mapping pageNumber reorderedPageNumbers = do
             let mustBeBefore = fromMaybe [] $ M.lookup pageNumber mapping
             let boolValues = scanr1 (||) $ map ((flip elem) mustBeBefore) reorderedPageNumbers
-            let (before, after) = groupElements(zip boolValues reorderedPageNumbers)
+            let (before, after) = groupElements $ zip boolValues reorderedPageNumbers
             before ++ [pageNumber] ++ after
 
         groupElements :: [(Bool, a)] -> ([a], [a])
         groupElements = foldl (\(trueValues, falseValues) (b, value) -> if b then (trueValues ++ [value], falseValues) else (trueValues, falseValues ++ [value])) ([], [])
-
-        get3rd :: (a, b, c) -> c
-        get3rd (_,_,x) = x
 
 solution1 :: String -> Int
 solution1 input = do

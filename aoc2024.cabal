@@ -20,28 +20,34 @@ executable day01
   import:           common-settings
   main-is:          Day01.hs
   hs-source-dirs:   challenges
-  other-modules:    Utils
+  other-modules:    ChallengeUtils
 
 executable day02
   import:           common-settings
   main-is:          Day02.hs
   hs-source-dirs:   challenges
-  other-modules:    Utils
+  other-modules:    ChallengeUtils
 
 executable day03
   import:           common-settings
   main-is:          Day03.hs
   hs-source-dirs:   challenges
-  other-modules:    Utils
+  other-modules:    ChallengeUtils
 
 executable day04
   import:           common-settings
   main-is:          Day04.hs
   hs-source-dirs:   challenges
-  other-modules:    Utils
+  other-modules:    ChallengeUtils
 
 executable day05
   import:           common-settings
   main-is:          Day05.hs
   hs-source-dirs:   challenges
-  other-modules:    Utils
+  other-modules:    ChallengeUtils
+
+executable day06
+  import:           common-settings
+  main-is:          Day06.hs
+  hs-source-dirs:   challenges
+  other-modules:    ChallengeUtils

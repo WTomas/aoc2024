@@ -1,7 +1,7 @@
 module Main where
   
 import Data.List (transpose, intercalate)
-import Utils (enumerate, flatMatrix, Position, splitEvery, boolToInt, printSolution1, printSolution2)
+import ChallengeUtils (enumerate, flatMatrix, Position, splitEvery, boolToInt, printSolution1, printSolution2)
 
 newtype Mask = Mask [[Char]]
 
