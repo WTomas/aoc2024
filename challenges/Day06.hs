@@ -1,12 +1,12 @@
 module Main where 
 
-import ChallengeUtils (Parser (runParser), parseChar, Position, flatMatrix, uncurry3, get3rd, printSolution1)
+import ChallengeUtils (Parser (runParser), parseChar, Position, flatMatrix, uncurry3, get3rd, printSolution1, printSolution2)
 import Control.Applicative (Alternative(many), (<|>))
 import Data.Maybe (fromMaybe)
 import Data.Foldable (find)
 import qualified Data.Set as Set
 
-data Direction = LEFT | RIGHT | UP | DOWN deriving (Show)
+data Direction = LEFT | RIGHT | UP | DOWN deriving (Show, Eq, Ord)
 
 data Guard = Guard Direction deriving Show
 
@@ -17,6 +17,10 @@ data Tile =
     deriving (Show)
 
 data GameTile = Tile Tile | TileGuard Guard deriving (Show)
+
+data MoveResult = OnPath | LeftTiles | ReachedLoop deriving (Show, Eq)
+
+type Path = Set.Set (Position, Direction)
 
 parsePathway :: Parser GameTile
 parsePathway = (\_ -> Tile Pathway) <$> parseChar '.'
@@ -62,23 +66,31 @@ extractGuard gameTiles = do
     isGuard (_, TileGuard _) = True
     isGuard _ = False
 
-makeMove :: [(Position, Tile)] -> (Position, Guard) -> ((Position, Guard), Bool)
-makeMove tiles guard = do
-  let ((nextGuardX, nextGuardY), nextGuard) = guardNextPosition guard
+makeMove :: Path -> [(Position, Tile)] -> (Position, Guard) -> ((Position, Guard), MoveResult)
+makeMove path tiles guard = do
+  let ((nextGuardX, nextGuardY), (Guard nextDirection)) = guardNextPosition guard
   let (_, tile) = fromMaybe ((nextGuardX, nextGuardY), Edge) $ find (\((tileX, tileY), _) -> tileX == nextGuardX && tileY == nextGuardY) tiles
   case tile of
-    Edge -> (((nextGuardX, nextGuardY), nextGuard), True)
-    Pathway -> (((nextGuardX, nextGuardY), nextGuard), False)
-    Obstruction -> ((fst guard, (turnGuard . snd) guard), False)
+    Edge -> (((nextGuardX, nextGuardY), (Guard nextDirection)), LeftTiles)
+    Pathway -> (((nextGuardX, nextGuardY), (Guard nextDirection)), (if Set.member ((nextGuardX, nextGuardY), nextDirection) path then ReachedLoop else OnPath))
+    Obstruction -> makeMove path tiles (fst guard, (turnGuard . snd) guard)
 
 
-makeMoves :: [(Position, Tile)] -> (Position, Guard) -> Set.Set Position -> ([(Position, Tile)], (Position, Guard), Set.Set Position)
-makeMoves tiles guard path = do
-  let updatedPath = (Set.insert . fst) guard path
-  let (nextGuard, hasLeft) = makeMove tiles guard
-  case hasLeft of
-    True -> (tiles, nextGuard, updatedPath)
-    False -> makeMoves tiles nextGuard updatedPath 
+makeMoves :: [(Position, Tile)] -> (Position, Guard) -> Path -> ([(Position, Tile)], (Position, Guard), Path, MoveResult)
+makeMoves tiles (guardPosition, Guard direction) path = do
+  let updatedPath = Set.insert (guardPosition, direction)  path
+  let (nextGuard, moveResult) = makeMove path tiles (guardPosition, Guard direction)
+  case moveResult of
+    OnPath -> makeMoves tiles nextGuard updatedPath
+    finalResult -> (tiles, nextGuard, updatedPath, finalResult)
+
+placeObstruction :: [(Position, Tile)] -> Position -> [(Position, Tile)]
+placeObstruction tiles position = map (placeObstruction' position) tiles
+  where
+    placeObstruction' :: Position -> (Position, Tile) -> (Position, Tile)
+    placeObstruction' (posX, posY) tile = case tile of 
+      (pos, Edge) -> (pos, Edge)
+      ((tilePosX, tilePosY), tileType) -> if tilePosX == posX && tilePosY == posY then ((tilePosX, tilePosY), Obstruction) else ((tilePosX, tilePosY), tileType)
 
 solution1 :: String -> Int
 solution1 input = do
@@ -87,10 +99,20 @@ solution1 input = do
       Nothing -> error "No map"
       Just tiles' -> do 
         let (tiles, guard) = extractGuard $ flatMatrix $ padTiles tiles'
-        Set.size $ get3rd $ makeMoves tiles guard Set.empty
-        
+        Set.size . Set.map fst . (\(_, _, path, moveResult) -> path) $ makeMoves tiles guard Set.empty
 
+solution2 :: String -> Int
+solution2 input = do
+    let tiles = sequence $ map ((<$>) snd) $ map (runParser (many (parseObstruction <|> parsePathway <|> parseGuard))) $ lines input
+    case tiles of 
+      Nothing -> error "No map"
+      Just tiles' -> do 
+        let (tiles, guard) = extractGuard $ flatMatrix $ padTiles tiles'
+        let guardPath = (\(_, _, path, moveResult) -> path) $ makeMoves tiles guard Set.empty
+        length . filter (\moveResult -> moveResult == ReachedLoop) . map (\(_, _, _, result) -> result) . map (\(tilesWithObstruction) -> makeMoves tilesWithObstruction guard Set.empty ) . map (placeObstruction tiles) $ Set.toList $ Set.map fst guardPath
+        
 main :: IO()
 main = do
   input <- readFile "inputs/day06.txt"
   printSolution1 $ solution1 input
+  printSolution2 $ solution2 input
