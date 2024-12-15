@@ -51,3 +51,9 @@ executable day06
   main-is:          Day06.hs
   hs-source-dirs:   challenges
   other-modules:    ChallengeUtils
+
+executable day07
+  import:           common-settings
+  main-is:          Day07.hs
+  hs-source-dirs:   challenges
+  other-modules:    ChallengeUtils
