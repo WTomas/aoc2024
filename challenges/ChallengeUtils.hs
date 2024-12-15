@@ -4,7 +4,7 @@ module ChallengeUtils where
 
 import qualified Data.Map as M
 import Data.Maybe (fromMaybe)
-import Data.List (deleteBy)
+import Data.List (deleteBy, tails)
 import Control.Applicative (Alternative (empty), (<|>))
 
 printSolution:: (Show a) => Int ->  a -> IO()
@@ -110,3 +110,9 @@ parseSpan predicate = Parser f
 
 get3rd :: (a, b, c) -> c
 get3rd (_,_,x) = x
+
+both :: (a -> b) -> (a, a) -> (b, b)
+both f (x, y) = (f x, f y)
+
+pairs :: [a] -> [(a, a)]
+pairs l = [(x,y) | (x:ys) <- tails l, y <- ys]
