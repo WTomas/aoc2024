@@ -116,3 +116,6 @@ both f (x, y) = (f x, f y)
 
 pairs :: [a] -> [(a, a)]
 pairs l = [(x,y) | (x:ys) <- tails l, y <- ys]
+
+replaceAt :: Int -> a -> [a] -> [a]
+replaceAt pos newVal list = take pos list ++ newVal : drop (pos+1) list
