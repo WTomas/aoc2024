@@ -1,4 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module ChallengeUtils where
 
@@ -29,10 +30,17 @@ data (Ord a) => Counter a = Counter {
 incrementCounter :: (Ord a) => Counter a -> a -> Counter a
 incrementCounter (counter@Counter { _map }) element = Counter { _map = M.insert element (counter ! element + 1) _map }
 
+incrementCounterBy :: (Ord a) => Counter a -> a -> Int -> Counter a
+incrementCounterBy (counter@Counter { _map }) element count = Counter { _map = M.insert element (counter ! element + count) _map }
+
 makeCounter :: (Ord a) => [a] -> Counter a
-makeCounter as = foldl incrementCounter Counter { _map = M.empty } as
+makeCounter = foldl incrementCounter Counter { _map = M.empty }
+
+size :: (Ord a) => Counter a -> Int
+size (Counter { _map }) = M.size _map
 
 instance (Ord a, Show a) => Show (Counter a) where
+    show :: (Ord a, Show a) => Counter a -> String
     show (Counter { _map }) = show _map
 
 deleteIndex :: Int -> [a] -> [a]
