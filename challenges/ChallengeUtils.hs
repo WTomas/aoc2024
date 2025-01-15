@@ -5,7 +5,7 @@ module ChallengeUtils where
 
 import qualified Data.Map as M
 import Data.Maybe (fromMaybe)
-import Data.List (deleteBy, tails)
+import Data.List (deleteBy, tails, find)
 import Control.Applicative (Alternative (empty), (<|>))
 
 printSolution:: (Show a) => Int ->  a -> IO()
@@ -130,3 +130,6 @@ fork f g a = (f a, g a)
 
 replaceAt :: Int -> a -> [a] -> [a]
 replaceAt pos newVal list = take pos list ++ newVal : drop (pos+1) list
+
+findAndPop :: (a -> Bool) -> [a] -> ([a], Maybe a)
+findAndPop predicate xs = (filter (not . predicate) xs, find predicate xs)
